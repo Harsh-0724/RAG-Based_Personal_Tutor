@@ -1,0 +1,28 @@
+This project is a Retrieval-Augmented Generation (RAG)-based web application that transforms a powerful Large Language Model (LLM) into a personal AI tutor that is an expert on any document you provide.
+
+Simply upload your study materials, research papers, or reports, and get instant, accurate answers to your questions. This tool is designed to help you learn faster, generate study materials, and get insights from your documents in a conversational way.
+
+Key Features
+
+* Interactive Chat: Ask questions in natural language and get answers that are grounded in the text you provide, not the AI's general knowledge.
+* Multi-Format Document Upload:** Supports PDF (`.pdf`), Microsoft Word (`.docx`), and plain text (`.txt`) files.
+* Question Generator: Automatically create a list of open-ended study questions based on the content of your documents.
+* Interactive Quiz Test: Generate a multiple-choice quiz from your materials, take the test directly in the app, and see your score instantly.
+* Blazing Fast: Powered by the Groq API for an incredibly fast and real-time user experience.
+
+How It Works
+
+This project uses a technique called Retrieval-Augmented Generation (RAG) to ensure answers are accurate and relevant.
+
+1.  Upload & Process: When you upload a file, the backend extracts the text and breaks it down into small, manageable chunks.
+2.  Retrieve & Augment: When you ask a question, the system intelligently finds the most relevant chunks from your document and combines them with your question.
+3.  Generate: This combined information is sent to the Large Language Model, which generates an answer based *only* on the context from your document.
+
+This process ensures the AI's answers are factually correct according to your materials and prevents it from making things up.
+
+Tech Stack
+
+* Backend: Python, FastAPI, Uvicorn
+* AI: Groq API (using Llama 3 models)
+* Document Processing: PyPDF2, python-docx
+* Frontend: HTML, CSS, vanilla JavaScript

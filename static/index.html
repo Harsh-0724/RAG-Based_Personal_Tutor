@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tutor - Your Personal Learning Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 1200px;
+            height: 85vh; /* Increased height slightly */
+            display: flex;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 320px; /* Increased width slightly */
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+        }
+
+        .upload-section {
+            margin-bottom: 30px;
+        }
+
+        .upload-section h3 {
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-label {
+            display: block;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px dashed rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-label:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .backend-status-section {
+            margin-bottom: 30px;
+        }
+        
+        .backend-status-section h3 {
+             margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .knowledge-base {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 200px; /* Ensure it has a minimum height */
+        }
+
+        .knowledge-base h3 {
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .document-list {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .document-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .delete-btn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+        }
+
+        .delete-btn:hover {
+            opacity: 1;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+
+        .header {
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 30px;
+            overflow: hidden; /* Prevent chat from overflowing */
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            padding: 15px 20px;
+            border-radius: 18px;
+            max-width: 80%;
+            line-height: 1.5; /* Improved readability */
+            animation: fadeIn 0.3s ease;
+        }
+
+        .user-message {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+
+        .bot-message {
+            background: white;
+            color: #333;
+            border: 1px solid #e1e5e9;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .input-container {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .message-input:focus {
+            border-color: #667eea;
+        }
+
+        .send-btn {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top: 3px solid #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        .status-indicator {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            margin-top: auto; /* Push to bottom */
+        }
+        
+        .backend-status {
+             margin-top: 0;
+        }
+
+        .status-ready {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-loading {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">🎓 AI Tutor</div>
+            
+            <div class="upload-section">
+                <h3>📚 Upload Documents</h3>
+                <input type="file" id="fileInput" class="file-input" multiple accept=".txt,.pdf,.docx">
+                <label for="fileInput" class="file-label">Click to upload files</label>
+            </div>
+            
+            <div class="backend-status-section">
+                <h3>🔗 Backend Status</h3>
+                <div class="status-indicator backend-status status-loading" id="backendStatus">
+                    Connecting...
+                </div>
+            </div>
+            
+            <div class="knowledge-base">
+                <h3>📖 Knowledge Base</h3>
+                <div class="document-list" id="documentList">
+                    <div style="color: rgba(255,255,255,0.7); text-align: center; padding: 20px;">
+                        No documents uploaded yet
+                    </div>
+                </div>
+            </div>
+            
+            <div class="status-indicator status-ready" id="status">
+                Ready to help you learn!
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="header">
+                <h1>Your Personal AI Learning Assistant</h1>
+                <p>Upload your study materials, then ask questions to get intelligent, context-aware answers.</p>
+            </div>
+            
+            <div class="chat-container">
+                <div class="messages" id="messages">
+                    <div class="message bot-message">
+                        <strong>🤖 AI Tutor:</strong> Hello! I'm your AI learning assistant. Please upload your study materials using the panel on the left. Then, I can help you understand them better!
+                    </div>
+                </div>
+                
+                <div class="input-container">
+                    <input type="text" id="messageInput" class="message-input" placeholder="Ask anything about your documents...">
+                    <button id="sendBtn" class="send-btn">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class AITutor {
+            constructor() {
+                this.isProcessing = false;
+                this.sessionId = this.generateSessionId();
+                this.backendUrl = 'http://localhost:8000'; // Change for production
+                
+                this.dom = {
+                    fileInput: document.getElementById('fileInput'),
+                    sendBtn: document.getElementById('sendBtn'),
+                    messageInput: document.getElementById('messageInput'),
+                    documentList: document.getElementById('documentList'),
+                    messages: document.getElementById('messages'),
+                    status: document.getElementById('status'),
+                    backendStatus: document.getElementById('backendStatus')
+                };
+
+                this.initializeEventListeners();
+                this.checkBackendHealth();
+            }
+
+            generateSessionId() {
+                return 'session_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+            }
+
+            async checkBackendHealth() {
+                try {
+                    const response = await fetch(`${this.backendUrl}/health`);
+                    if (response.ok) {
+                        this.setBackendStatus('Connected ✓', 'ready');
+                        await this.loadDocuments(); // Load existing docs for this session
+                    } else {
+                        this.setBackendStatus('Backend Error', 'error');
+                    }
+                } catch (error) {
+                    this.setBackendStatus('Backend Offline', 'error');
+                    console.error('Backend health check failed:', error);
+                }
+            }
+
+            setBackendStatus(message, type) {
+                this.dom.backendStatus.textContent = message;
+                this.dom.backendStatus.className = `status-indicator backend-status status-${type}`;
+            }
+
+            setStatus(message, type) {
+                this.dom.status.textContent = message;
+                this.dom.status.className = `status-indicator status-${type}`;
+            }
+
+            initializeEventListeners() {
+                this.dom.fileInput.addEventListener('change', (e) => this.handleFileUpload(e.target.files));
+                this.dom.sendBtn.addEventListener('click', () => this.sendMessage());
+                this.dom.messageInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.sendMessage();
+                });
+                
+                // --- NEW: Event listener for deleting documents ---
+                this.dom.documentList.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('delete-btn')) {
+                        const docId = e.target.dataset.docId;
+                        this.handleDeleteDocument(docId);
+                    }
+                });
+            }
+
+            async handleFileUpload(files) {
+                if(files.length === 0) return;
+                this.setStatus('Uploading documents...', 'loading');
+                
+                const formData = new FormData();
+                for (let file of files) {
+                    formData.append('files', file);
+                }
+                formData.append('session_id', this.sessionId);
+
+                try {
+                    const response = await fetch(`${this.backendUrl}/upload`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.detail || 'Upload failed');
+                    }
+
+                    await this.loadDocuments(); // Refresh the document list from server
+                    this.setStatus(`${files.length} document(s) uploaded successfully!`, 'ready');
+                    
+                } catch (error) {
+                    console.error('Upload error:', error);
+                    this.setStatus(`Upload error: ${error.message}`, 'error');
+                }
+            }
+            
+            // --- NEW: Function to handle document deletion ---
+            async handleDeleteDocument(docId) {
+                if (!confirm('Are you sure you want to delete this document?')) {
+                    return;
+                }
+                this.setStatus('Deleting document...', 'loading');
+                try {
+                    const response = await fetch(`${this.backendUrl}/documents/${this.sessionId}/${docId}`, {
+                        method: 'DELETE'
+                    });
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.detail || 'Failed to delete');
+                    }
+                    this.setStatus('Document deleted.', 'ready');
+                    await this.loadDocuments(); // Refresh list after deleting
+                } catch(error) {
+                    console.error('Delete error:', error);
+                    this.setStatus(`Delete error: ${error.message}`, 'error');
+                }
+            }
+
+            async loadDocuments() {
+                try {
+                    const response = await fetch(`${this.backendUrl}/documents/${this.sessionId}`);
+                    if (response.ok) {
+                        const docs = await response.json();
+                        this.updateDocumentList(docs);
+                    }
+                } catch (error) {
+                    console.error('Error loading documents:', error);
+                }
+            }
+
+            updateDocumentList(docs) {
+                if (!docs || docs.length === 0) {
+                    this.dom.documentList.innerHTML = `<div style="color: rgba(255,255,255,0.7); text-align: center; padding: 20px;">No documents uploaded yet</div>`;
+                    return;
+                }
+                
+                // --- UPDATED: Include a delete button for each document ---
+                this.dom.documentList.innerHTML = docs.map(doc => 
+                    `<div class="document-item">
+                        <div>
+                            📄 ${doc.name}
+                            <div style="font-size: 11px; opacity: 0.8; margin-top: 4px;">
+                                ${doc.chunk_count} chunks
+                            </div>
+                        </div>
+                        <button class="delete-btn" data-doc-id="${doc.id}" title="Delete document">🗑️</button>
+                    </div>`
+                ).join('');
+            }
+
+            async sendMessage() {
+                const message = this.dom.messageInput.value.trim();
+                if (!message || this.isProcessing) return;
+
+                this.addMessage(message, 'user');
+                this.dom.messageInput.value = '';
+                this.isProcessing = true;
+                this.updateSendButton();
+
+                try {
+                    const response = await fetch(`${this.backendUrl}/chat`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ query: message, session_id: this.sessionId })
+                    });
+
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.detail || 'Chat request failed');
+                    }
+
+                    const chatResponse = await response.json();
+                    let responseText = chatResponse.response;
+                    
+                    if (chatResponse.sources_used && chatResponse.sources_used.length > 0) {
+                        responseText += `<br><br><small><strong>📚 Sources:</strong> ${chatResponse.sources_used.join(', ')}</small>`;
+                    }
+                    
+                    this.addMessage(responseText, 'bot');
+                } catch (error) {
+                    console.error('Chat error:', error);
+                    this.addMessage(`Sorry, I encountered an error: ${error.message}`, 'bot');
+                }
+
+                this.isProcessing = false;
+                this.updateSendButton();
+            }
+
+            addMessage(text, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}-message`;
+                
+                const prefix = sender === 'user' ? '👤 You:' : '🤖 AI Tutor:';
+                messageDiv.innerHTML = `<strong>${prefix}</strong><br>${text.replace(/\n/g, '<br>')}`;
+                
+                this.dom.messages.appendChild(messageDiv);
+                this.dom.messages.scrollTop = this.dom.messages.scrollHeight;
+            }
+
+            updateSendButton() {
+                if (this.isProcessing) {
+                    this.dom.sendBtn.innerHTML = '<div class="loading"></div>';
+                    this.dom.sendBtn.disabled = true;
+                } else {
+                    this.dom.sendBtn.innerHTML = 'Send';
+                    this.dom.sendBtn.disabled = false;
+                }
+            }
+        }
+
+        // Initialize the app
+        new AITutor();
+    </script>
+</body>
+</html>
